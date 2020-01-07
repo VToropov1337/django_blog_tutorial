@@ -1,24 +1,14 @@
 from django.shortcuts import render, get_object_or_404, HttpResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Post
+from django.views.generic import ListView
 
 
-def post_list(request):  
-    object_list = Post.published.all()  
-    paginator = Paginator(object_list, 3)  # 3 поста на каждой странице  
-    page = request.GET.get('page')
-    try:
-        posts = paginator.page(page)  
-    except PageNotAnInteger:  
-        # Если страница не является целым числом, поставим первую страницу  
-        posts = paginator.page(1)  
-    except EmptyPage:  
-        # Если страница больше максимальной, доставить последнюю страницу результатов  
-        posts = paginator.page(paginator.num_pages)  
-    return render(request,  
-	          'blog/post/list.html',  
-		  {'page': page,  
-		   'posts': posts})
+class PostListView(ListView):  
+    queryset = Post.published.all()  
+    context_object_name = 'posts'  
+    paginate_by = 1  
+    template_name = 'blog/post/list.html'
 
 
 def post_detail(request, year, month, day, post):  
